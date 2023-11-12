@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-export async function main(){
-    await mongoose.connect('mongodb://local:27017/getapet')
+async function main() {
+  await mongoose.connect("mongodb://0.0.0.0:27017/getMarket");
 
-    console.log("Conectou ao Mongoose!")
-
+  console.log("Conectou ao Mongoose!");
 }
 
-main.catch((err) => console.log(err))
+main().catch((err) => console.log(err));
 
+export default mongoose;
