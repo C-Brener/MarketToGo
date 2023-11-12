@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.js localhost 5000"
+    "start": "nodemon src/index.js localhost 5000",
+    "startdebug": "nodemon --inspect=9229 src/index.js"
   },
   "keywords": [],
   "author": "",
