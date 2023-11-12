@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 export default class UserController {
   static async register(req, res) {
     const { name, email, phone, password, confirmPassword } = req.body;
-
     const isFieldMissing = (field, fieldName) => {
       if (!field) {
         res.status(422).json({ message: `The ${fieldName} is necessary` });
@@ -13,7 +12,6 @@ export default class UserController {
       }
       return false;
     };
-
     switch (true) {
       case isFieldMissing(name, "name"):
       case isFieldMissing(email, "email"):
@@ -23,12 +21,7 @@ export default class UserController {
         return;
     }
     UserController.handlePassword(res, password, confirmPassword);
-
-    const userExists = await User.findOne({ email: email }).maxTimeMS(3000);
-    if (userExists) {
-      res.status(422).json({ message: `The user email already exist` });
-      return;
-    }
+    UserController.handleUserVerification(email, res);
 
     const salt = await bcrypt.genSalt(12);
     const passwordHash = await bcrypt.hash(password, salt);
@@ -42,13 +35,41 @@ export default class UserController {
       confirmPassword: confirmPasswordHash,
     });
 
-    try {
-      const newUser = await user.save();
+    UserController.handleUserCreate(user, req, res);
+  }
 
-      await createUserToken(newUser, req, res);
-    } catch (error) {
-      res.status(500).json({ message: error.toString() });
+  static async login(req, res) {
+    const { email, password } = req.body;
+    const isFieldMissing = (field, fieldName) => {
+      if (!field) {
+        res.status(422).json({ message: `The ${fieldName} is necessary` });
+        return true;
+      }
+      return false;
+    };
+
+    if (true) {
+      isFieldMissing(email, "email");
+      isFieldMissing(password, "password");
     }
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      res.status(422).json({
+        message: `The user or password not exists, please, verify your informations and try again.`,
+      });
+      return;
+    }
+
+    const checkPassword = await bcrypt.compare(password, user.password);
+    if (!checkPassword) {
+      res.status(422).json({
+        message: `The user or password not exists, please, verify your informations and try again.`,
+      });
+      return;
+    }
+
+    await createUserToken(user, req, res);
   }
 
   static handlePassword(res, password, confirmPassword) {
@@ -56,6 +77,25 @@ export default class UserController {
       res
         .status(422)
         .json({ message: `The password and confirmPassword is different` });
+      return;
+    }
+  }
+
+  static async handleUserVerification(email, res) {
+    const userExists = await User.findOne({ email: email }).maxTimeMS(3000);
+    if (userExists) {
+      res.status(422).json({ message: `The user email already exist` });
+      return;
+    }
+  }
+
+  static async handleUserCreate(user, req, res) {
+    try {
+      const newUser = await user.save();
+
+      await createUserToken(newUser, req, res);
+    } catch (error) {
+      res.status(500).json({ message: error });
       return;
     }
   }
