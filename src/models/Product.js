@@ -1,7 +1,7 @@
 import mongoose from "../db/conn.js";
 import { Schema } from "mongoose";
 
-export const Product = mongoose.model(
+const Product = mongoose.model(
   "Product",
   new Schema(
     {
@@ -20,11 +20,12 @@ export const Product = mongoose.model(
         type: String,
         required: true,
       },
-      available:{
-        type:Boolean,
+      available: {
+        type: Boolean,
       },
-      
     },
     { timestamps: true }
   )
 );
+
+export default Product;
