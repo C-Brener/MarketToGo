@@ -1,5 +1,6 @@
+import createUserToken from "../helpers/create-user-token.js";
 import User from "../models/User.js";
-import { genSalt, hash } from "bcrypt";
+import bcrypt from "bcrypt";
 
 export default class UserController {
   static async register(req, res) {
@@ -29,24 +30,24 @@ export default class UserController {
       return;
     }
 
-    const salt = await genSalt(12);
-    const passwordHash = await hash(password, salt);
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
+    const confirmPasswordHash = await bcrypt.hash(confirmPassword, salt);
 
     const user = new User({
       name: name,
       email: email,
       phone: phone,
       password: passwordHash,
+      confirmPassword: confirmPasswordHash,
     });
 
     try {
       const newUser = await user.save();
-      res.status(201).json({
-        message: "User Created!",
-        newUser,
-      });
+
+      await createUserToken(newUser, req, res);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: error.toString() });
     }
   }
 
