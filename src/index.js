@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import UserRoutes from "./routes/UserRoutes.js";
+import ProductRoutes from "./routes/ProductRoutes.js"
+import SupermarketRoutes from "./routes/SupermarketRoutes.js";
 
 const app = express();
 
@@ -15,6 +17,8 @@ app.use(express.static("public"));
 
 //Routes
 app.use("/users", UserRoutes);
+app.use("/products", ProductRoutes);
+app.use("/supermarket", SupermarketRoutes);
 
 app.listen(5000, () => {
   console.log("Servidor rodando na porta 5000");
