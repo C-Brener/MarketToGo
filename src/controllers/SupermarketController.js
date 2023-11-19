@@ -122,8 +122,8 @@ export default class SupermarketController{
     }
 
     static async handleSupermarketVerification(register, res) {
-        const supermaketrExists = await Supermarket.findOne({ register: register}).maxTimeMS(3000);
-        if (supermaketrExists) {
+        const isExists = await Supermarket.findOne({ register: register}).maxTimeMS(3000);
+        if (isExists) {
           res.status(422).json({ message: `The user email already exist` });
           return;
         }
