@@ -1,5 +1,7 @@
 import createUserToken from "../helpers/create-user-token.js";
 import User from "../models/User.js";
+import getToken from "../helpers/get-token.js";
+import Jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 export default class UserController {
@@ -70,6 +72,21 @@ export default class UserController {
     }
 
     await createUserToken(user, req, res);
+  }
+
+  static async checkUser(req, res) {
+    let currentUser;
+    console.log(req.headers.authorization);
+    if (req.headers.authorization) {
+      let token = getToken(req);
+      const decoded = Jwt.verify(token, "oursecret");
+      currentUser = await User.findById(decoded.id);
+
+      currentUser.password = undefined;
+    } else {
+      currentUser = null;
+      res.status(401).json({ message: `Unauthorized` });
+    }
   }
 
   static handlePassword(res, password, confirmPassword) {
