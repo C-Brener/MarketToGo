@@ -76,7 +76,6 @@ export default class UserController {
 
   static async checkUser(req, res) {
     let currentUser;
-    console.log(req.headers.authorization);
     if (req.headers.authorization) {
       let token = getToken(req);
       const decoded = Jwt.verify(token, "oursecret");
@@ -110,6 +109,13 @@ export default class UserController {
       return;
     }
     res.status(200).json({ findUser });
+  }
+
+  static async editUser(req, res) {
+    res.status(200).json({
+      message: "Update It's working!",
+    });
+    return;
   }
 
   static handlePassword(res, password, confirmPassword) {
