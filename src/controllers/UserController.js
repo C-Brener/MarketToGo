@@ -89,6 +89,29 @@ export default class UserController {
     }
   }
 
+  static async getUserById(req, res) {
+    const id = req.params.id;
+
+    let findUser;
+
+    try {
+      findUser = await User.findById(id).select("id name");
+    } catch (error) {
+      res.status(404).json({
+        message: "User not found",
+      });
+      return;
+    }
+
+    if (!findUser) {
+      res.status(422).json({
+        message: "User not found",
+      });
+      return;
+    }
+    res.status(200).json({ findUser });
+  }
+
   static handlePassword(res, password, confirmPassword) {
     if (password != confirmPassword) {
       res
