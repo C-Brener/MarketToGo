@@ -1,5 +1,6 @@
 import mongoose from "../db/conn.js";
 import { Schema } from "mongoose";
+import Supermarket from "./Supermerket.js";
 
 const Product = mongoose.model(
   "Product",
@@ -9,19 +10,17 @@ const Product = mongoose.model(
         type: String,
         required: true,
       },
-      value: {
+      price: {
         type: Number,
         required: true,
-      },
-      image: {
-        type: String,
       },
       finished_date: {
         type: String,
         required: true,
       },
-      available: {
-        type: Boolean,
+      market: {
+        type: String,
+        required: true
       },
     },
     { timestamps: true }
