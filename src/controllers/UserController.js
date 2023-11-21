@@ -112,10 +112,25 @@ export default class UserController {
   }
 
   static async editUser(req, res) {
-    res.status(200).json({
-      message: "Update It's working!",
-    });
-    return;
+    const id = req.params.id;
+    const { name, email, phone, password, confirmpassword } = req.body;
+
+    let user;
+
+    try {
+      user = await User.findById(id);
+    } catch (error) {
+      res.status(422).json({
+        message: "User not found!",
+      });
+    }
+
+    if (!user) {
+      res.status(422).json({
+        message: "User not found!",
+      });
+      return;
+    }
   }
 
   static handlePassword(res, password, confirmPassword) {
