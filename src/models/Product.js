@@ -1,6 +1,5 @@
 import mongoose from "../db/conn.js";
 import { Schema } from "mongoose";
-import Supermarket from "./Supermerket.js";
 
 const Product = mongoose.model(
   "Product",

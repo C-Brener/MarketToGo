@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 
 export default class UserController {
   static async register(req, res) {
+    console.log("Teste");
     const { name, email, phone, password, confirmPassword } = req.body;
     const isFieldMissing = (field, fieldName) => {
       if (!field) {
@@ -38,6 +39,29 @@ export default class UserController {
     });
 
     UserController.handleUserCreate(user, req, res);
+  }
+
+  static async getUserById(req, res) {
+    const id = req.params.id;
+
+    let findUser;
+
+    try {
+      findUser = await User.findById(id).select("-password -confirmPassword");
+    } catch (error) {
+      res.status(404).json({
+        message: "User not found",
+      });
+      return;
+    }
+
+    if (!findUser) {
+      res.status(422).json({
+        message: "User not found",
+      });
+      return;
+    }
+    res.status(200).json({ findUser });
   }
 
   static async login(req, res) {
@@ -86,29 +110,6 @@ export default class UserController {
       currentUser = null;
       res.status(401).json({ message: `Unauthorized` });
     }
-  }
-
-  static async getUserById(req, res) {
-    const id = req.params.id;
-
-    let findUser;
-
-    try {
-      findUser = await User.findById(id).select("id name");
-    } catch (error) {
-      res.status(404).json({
-        message: "User not found",
-      });
-      return;
-    }
-
-    if (!findUser) {
-      res.status(422).json({
-        message: "User not found",
-      });
-      return;
-    }
-    res.status(200).json({ findUser });
   }
 
   static async editUser(req, res) {
