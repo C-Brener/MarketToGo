@@ -131,6 +131,10 @@ export default class UserController {
 
     let image;
 
+    if (req.file) {
+      user.image = req.file.filename;
+    }
+
     isFieldMissing(name, "name");
     user.name = name;
 
@@ -154,19 +158,18 @@ export default class UserController {
       user.password = passwordHash;
     }
 
-
     try {
       const updatedUser = await User.findOneAndUpdate(
         { _id: user._id },
         { $set: user },
-        { new: true },
-      )
+        { new: true }
+      );
       res.json({
-        message: 'Usuário atualizado com sucesso!',
+        message: "User updated with success!",
         data: updatedUser,
-      })
+      });
     } catch (error) {
-      res.status(500).json({ message: error })
+      res.status(500).json({ message: error });
     }
   }
 
