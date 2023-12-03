@@ -4,6 +4,7 @@ import getToken from "../helpers/get-token.js";
 import Jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import getUserByToken from "../helpers/get-user-by-token.js";
+import { SECRET_KEY } from "../config/constants.js";
 
 export default class UserController {
   static async register(req, res) {
@@ -18,9 +19,9 @@ export default class UserController {
         return;
     }
     UserController.handlePassword(res, password, confirmPassword);
-    if(UserController.handleUserVerification(email, res)){
-      return
-    };
+    if (await UserController.handleUserVerification(email, res)) {
+      return;
+    }
 
     const salt = await bcrypt.genSalt(12);
     const passwordHash = await bcrypt.hash(password, salt);
@@ -97,8 +98,8 @@ export default class UserController {
       currentUser.password = undefined;
     } else {
       currentUser = null;
-      res.status(401).json({ message: `Unauthorized` });
     }
+    res.status(200).send(currentUser);
   }
 
   static async editUser(req, res) {
@@ -112,7 +113,7 @@ export default class UserController {
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
 
-    UserController.handleImageUpload(req,user)
+    UserController.handleImageUpload(req, user);
 
     UserController.isFieldMissing(name, "name");
     user.name = name;
