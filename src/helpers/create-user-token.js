@@ -1,4 +1,5 @@
 import Jwt from "jsonwebtoken";
+import { SECRET_KEY } from "../config/constants.js";
 
 const createUserToken = async (user, req, res) => {
   const token = Jwt.sign(
@@ -6,7 +7,7 @@ const createUserToken = async (user, req, res) => {
       name: user.name,
       id: user.id,
     },
-    "oursecret"
+    SECRET_KEY
   );
 
   res.status(200).json({

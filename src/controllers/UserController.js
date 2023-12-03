@@ -8,23 +8,19 @@ import getUserByToken from "../helpers/get-user-by-token.js";
 export default class UserController {
   static async register(req, res) {
     const { name, email, phone, password, confirmPassword } = req.body;
-    const isFieldMissing = (field, fieldName) => {
-      if (!field) {
-        res.status(422).json({ message: `The ${fieldName} is necessary` });
-        return true;
-      }
-      return false;
-    };
+
     switch (true) {
-      case isFieldMissing(name, "name"):
-      case isFieldMissing(email, "email"):
-      case isFieldMissing(phone, "phone"):
-      case isFieldMissing(password, "password"):
-      case isFieldMissing(confirmPassword, "confirmPassword"):
+      case UserController.isFieldMissing(name, "name"):
+      case UserController.isFieldMissing(email, "email"):
+      case UserController.isFieldMissing(phone, "phone"):
+      case UserController.isFieldMissing(password, "password"):
+      case UserController.isFieldMissing(confirmPassword, "confirmPassword"):
         return;
     }
     UserController.handlePassword(res, password, confirmPassword);
-    UserController.handleUserVerification(email, res);
+    if(UserController.handleUserVerification(email, res)){
+      return
+    };
 
     const salt = await bcrypt.genSalt(12);
     const passwordHash = await bcrypt.hash(password, salt);
@@ -66,17 +62,10 @@ export default class UserController {
 
   static async login(req, res) {
     const { email, password } = req.body;
-    const isFieldMissing = (field, fieldName) => {
-      if (!field) {
-        res.status(422).json({ message: `The ${fieldName} is necessary` });
-        return true;
-      }
-      return false;
-    };
 
     if (true) {
-      isFieldMissing(email, "email");
-      isFieldMissing(password, "password");
+      UserController.isFieldMissing(email, "email");
+      UserController.isFieldMissing(password, "password");
     }
 
     const user = await User.findOne({ email: email });
@@ -114,12 +103,6 @@ export default class UserController {
 
   static async editUser(req, res) {
     const token = getToken(req);
-    const isFieldMissing = (field, fieldName) => {
-      if (!field) {
-        res.status(422).json({ message: `The ${fieldName} is necessary` });
-        return;
-      }
-    };
 
     const user = await getUserByToken(token);
 
@@ -129,16 +112,12 @@ export default class UserController {
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
 
-    let image;
+    UserController.handleImageUpload(req,user)
 
-    if (req.file) {
-      user.image = req.file.filename;
-    }
-
-    isFieldMissing(name, "name");
+    UserController.isFieldMissing(name, "name");
     user.name = name;
 
-    isFieldMissing(email, "email");
+    UserController.isFieldMissing(email, "email");
     const userExists = await User.findOne({ email: email });
     if (user.email !== email && userExists) {
       res.status(422).json({ message: "Please, set other email" });
@@ -146,7 +125,7 @@ export default class UserController {
     }
     user.email = email;
 
-    isFieldMissing(phone, "phone");
+    UserController.isFieldMissing(phone, "phone");
     user.phone = phone;
 
     if (password != confirmPassword) {
@@ -183,11 +162,12 @@ export default class UserController {
   }
 
   static async handleUserVerification(email, res) {
-    const userExists = await User.findOne({ email: email }).maxTimeMS(3000);
+    const userExists = await User.findOne({ email });
     if (userExists) {
-      res.status(422).json({ message: `The user email already exist` });
-      return;
+      res.status(422).json({ message: "The user email already exists" });
+      return true;
     }
+    return false;
   }
 
   static async handleUserCreate(user, req, res) {
@@ -198,6 +178,20 @@ export default class UserController {
     } catch (error) {
       res.status(500).json({ message: error });
       return;
+    }
+  }
+
+  static isFieldMissing(field, fieldName, res) {
+    if (!field) {
+      res.status(422).json({ message: `The ${fieldName} is necessary` });
+      return true;
+    }
+    return false;
+  }
+
+  static handleImageUpload(req, user) {
+    if (req.file) {
+      user.image = req.file.filename;
     }
   }
 }

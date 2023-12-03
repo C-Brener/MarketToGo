@@ -1,5 +1,6 @@
 import Jwt from "jsonwebtoken";
 import getToken from "./get-token.js";
+import { SECRET_KEY } from "../config/constants.js";
 
 const verifyToken = (req, res, next) => {
   if (!req.headers.authorization) {
@@ -12,7 +13,7 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const verified = Jwt.verify(token, "oursecret");
+    const verified = Jwt.verify(token, SECRET_KEY);
     req.user = verified;
     next();
   } catch (error) {
