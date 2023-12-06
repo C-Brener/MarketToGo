@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
 import UserRoutes from "./routes/UserRoutes.js";
-import ProductRoutes from "./routes/ProductRoutes.js"
+import ProductRoutes from "./routes/ProductRoutes.js";
 import SupermarketRoutes from "./routes/SupermarketRoutes.js";
+import { host } from "./config/enviroment.js";
 
 const app = express();
 
@@ -10,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 //Cors
-app.use(cors({ credentials: true, origin: "http://localhost:5000"}));
+app.use(cors({ credentials: true, origin: `http://${host}:5000` }));
 
 //Public Images
 app.use(express.static("public"));

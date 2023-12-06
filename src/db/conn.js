@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import { host } from "../config/enviroment.js";
 
 async function main() {
-  await mongoose.connect("mongodb://0.0.0.0:27017/getMarket");
+  await mongoose.connect(`mongodb://${host}:27017/getMarket`);
 
   console.log("Conectou ao Mongoose!");
 }
