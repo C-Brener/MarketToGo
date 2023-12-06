@@ -1,4 +1,4 @@
-import Supermarket from "../models/Supermerket.js";
+import Supermarket from "../models/Supermarket.js";
 
 export default class SupermarketController{
 
